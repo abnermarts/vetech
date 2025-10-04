@@ -25,10 +25,10 @@ Com o Vetech, é possível **criar atestados em massa**, vinculados a produtores
 ## 🛠️ Tecnologias Utilizadas
 
 - **Frontend:** React / Next.js / TypeScript  
-- **Backend:** Node.js (Express ou NestJS)  
+- **Backend:** Node.js (Express)  
 - **Banco de Dados:** PostgreSQL (via Prisma ORM)  
 - **Autenticação:** JWT / OAuth (planejado)  
-- **Infraestrutura:** Docker / SaaS em cloud  
+- **Infraestrutura:** SaaS em cloud  
 
 ---
 
