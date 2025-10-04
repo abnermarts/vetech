@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Veterinary {
+  id                String     @id @default(uuid())
+  email             String
+  user              String
+  password          String
+  created_at        DateTime?  @default(now())
+  update_at         DateTime?  @default(now())
+  UF                String
+  csTipoAtuacao     String
+  idVeterinario     Int
+  nrCrmvVeterinario String
+  nrDocumento       String
+  idPessoa          Int
+  nmPessoa          String?
+  passwordSigen     String?
+  userSigen         String?
+  customers         Customer[]
+  exame             Exame[]
+
+  @@map("veterinarys")
+}
+
+model Customer {
+  id                  String               @id @default(uuid())
+  cpf                 String
+  Municipio           String?
+  Rua                 String?
+  Numero              String?
+  idUnidadeExploracao Int
+  customerName        String
+  relatedVeterinary   String?
+  pass                String?
+  connected           Boolean?             @default(false)
+  veterinary          Veterinary?          @relation(fields: [relatedVeterinary], references: [id])
+  customerFilho       Filho[]
+  ProductersSelected  ProductersSelected[]
+
+  @@map("customer")
+}
+
+model Filho {
+  id                    String   @id @default(uuid())
+  idCustomerFather      String
+  id_especie_animal     Int
+  nm_especie_animal     String
+  id_unidade_exploracao Int
+  cdOficialFormatado    String
+  idMunicipio           Int
+  idPessoa              Int
+  idPropriedade         Int
+  idUF                  Int
+  nmLocalidade          String
+  uf                    String
+  animals               Animal[]
+  Customer              Customer @relation(fields: [idCustomerFather], references: [id])
+  Exame                 Exame[]
+
+  @@map("customerfilho")
+}
+
+model Animal {
+  id                    String         @id @default(uuid())
+  dsIdentificacaoAnimal String
+  dsDataNascimento      DateTime
+  animalName            String
+  dsPelagem             String
+  customerId            String
+  specieId              Int
+  diamAnilha            String
+  sexoId                String
+  customer              Filho          @relation(fields: [customerId], references: [id])
+  sexo                  Sexo           @relation(fields: [sexoId], references: [id])
+  specie                Specie         @relation(fields: [specieId], references: [id])
+  exameAnimals          ExameAnimals[]
+
+  @@map("animal")
+}
+
+model Sexo {
+  id     String   @unique
+  csFlag String
+  dsFlag String
+  idToDb String   @id @default(uuid())
+  animal Animal[]
+
+  @@map("sexo")
+}
+
+model Specie {
+  scienceName     String?
+  scienceAnimalId Int?
+  specieName      String
+  id              Int      @id @unique
+  animal          Animal[]
+
+  @@map("specie")
+}
+
+model Identificators {
+  id                 String               @id
+  created_at         DateTime?            @default(now())
+  updated_at         DateTime?            @default(now())
+  productersSelected ProductersSelected[]
+
+  @@map("identificators")
+}
+
+model ProductersSelected {
+  id               String          @id @default(uuid())
+  Identificators   Identificators? @relation(fields: [identificatorsId], references: [id])
+  customer         Customer?       @relation(fields: [producterId], references: [id])
+  identificatorsId String
+  producterId      String
+
+  @@map("productersselected")
+}
+
+model Exame {
+  id              String           @id @default(uuid())
+  created_at      DateTime?        @default(now())
+  idExameDoenca   Int?
+  SendExame       Boolean          @default(false)
+  filhoId         String
+  relatedId       String
+  veterinaryId    String
+  eventId         String?
+  filho           Filho            @relation(fields: [filhoId], references: [id])
+  veterinary      Veterinary       @relation(fields: [veterinaryId], references: [id])
+  event           Event?           @relation(fields: [eventId], references: [id])
+  exameAnimals    ExameAnimals[]
+  errorTableExame ErroTableExame[]
+
+  @@map("exame")
+}
+
+model ErroTableExame {
+  id         String    @id @default(uuid())
+  exame_id   String
+  created_at DateTime? @default(now())
+  text       String?
+  exame      Exame     @relation(fields: [exame_id], references: [id])
+
+  @@map("errortableexame")
+}
+
+model ExameAnimals {
+  id         String    @id @default(uuid())
+  created_at DateTime? @default(now())
+  exame_id   String
+  animal_id  String
+  animals    Animal    @relation(fields: [animal_id], references: [id])
+  exame      Exame     @relation(fields: [exame_id], references: [id])
+
+  @@map("exameanimals")
+}
+
+model Event {
+  id                    String   @id @default(uuid())
+  created_at            DateTime @default(now())
+  updated_at            DateTime @default(now())
+  id_unidade_exploracao Int
+  nm_unidade_exploracao String
+  nr_unidade_exploracao Int
+  eventName             String
+  eventStatus           String?  @default("ACTIVE")
+  cd_oficial_formatado  String
+  cs_flag               String?
+  ds_flag               String?
+  eventId               Int
+  id_municipio          Int?
+  nm_localidade         String?
+  nm_municipio          String?
+  nm_pessoa             String
+  pessoaTitularId       String
+  sg_uf                 String?
+  Exame                 Exame[]
+
+  @@map("event")
+}
